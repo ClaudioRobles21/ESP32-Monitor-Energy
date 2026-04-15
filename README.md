@@ -276,6 +276,9 @@ Revisa dos cosas: (1) que el `BOT_TOKEN` y el `CHAT_ID` en el código sean exact
 **Las lecturas tienen mucho ruido y varían mucho entre mediciones, ¿cómo lo reduzco?**
 El ruido eléctrico suele deberse a capacitores mal colocados o ausentes. Verifica que C1 y C2 (10 µF cada uno) estén conectados entre el nodo de GND y la alimentación, y que C3 (acoplamiento AC) esté correctamente en serie entre el TIP del jack y el nodo bias. Como solución por software, puedes agregar un promedio móvil de 10 muestras consecutivas antes de usar el valor de corriente.
 
+**ACLARACIÓN**
+El potenciómetro integrado en el circuito es un componente opcional; su inclusión en este diseño responde a la necesidad de ajustar con precisión el punto de polarización (bias), dado que los valores fijos de las resistencias disponibles no permitían obtener la polarización adecuada para el correcto funcionamiento del circuito.
+
 ## Contribuir
 
 1. Haz fork del repositorio.
