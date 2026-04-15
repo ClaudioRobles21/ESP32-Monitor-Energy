@@ -71,7 +71,7 @@ ESP32
 esp32-energy-monitor/
 ├── monitor_energia_esp32_v2.ino   ← código principal (producción)
 ├── Prueba_Sensor.ino              ← sketch de verificación del sensor
-├── assets/
+├── Imagenes/
 │   ├── Esquema_de_circuito_electrico.png
 │   ├── Diagrama_de_salida_jack_3_5_mm.png
 │   └── Esquema_sensor_SCT-013-30A.png
@@ -91,7 +91,8 @@ esp32-energy-monitor/
 | R1, R2 | 2 × resistencia 10 kΩ |
 | C1, C2 | 2 × capacitor electrolítico 10 µF (filtro de alimentación) |
 | C3 | 1 × capacitor electrolítico 10 µF (acoplamiento AC) |
-| Protoboard + cables | — |
+| Protoboard + cables | - |
+|Fuente de alimentacion de 5 V| — |
 
 ### Esquema de conexión
 
@@ -113,7 +114,7 @@ El divisor de voltaje crea un punto de bias de ~1.65 V para que la señal AC del
 nodo bias ──── GPIO34 (solo entrada, ADC1 canal 6)
 ```
 
-> Ver imagen `assets/Esquema_de_circuito_electrico.png` para el diagrama completo con colores.
+> Ver imagen `Imagenes/Esquema_de_circuito_electrico.png` para el diagrama completo con colores.
 
 **Conexión del jack 3.5 mm del SCT-013-30A:**
 
@@ -257,6 +258,23 @@ const float UMBRAL_ALERTA_AMPERES = 0.4;  // cambiar al valor que necesites
 Sí, cambia `VOLTAJE_RED` al voltaje de tu país. Para 50 Hz es recomendable aumentar `MUESTRAS_RMS` a 1200 para capturar el mismo número de ciclos completos.
 
 ---
+**¿Por qué el sensor siempre lee 0 A aunque haya carga conectada?**
+La causa más común es que los dos conductores del cable (fase y neutro) están pasando juntos por el interior del sensor. Los campos magnéticos de ambos se cancelan entre sí. Asegúrate de que por el sensor pase **únicamente el cable de fase**, no el par completo.
+
+**¿Por qué las lecturas son muy altas o muy bajas comparadas con un multímetro?**
+El valor de calibración no coincide con tu instalación. Conecta un aparato de consumo conocido (por ejemplo, un calentador eléctrico con potencia indicada en la etiqueta), mide con el sistema y ajusta `CALIBRACION_SENSOR` hasta que el valor calculado coincida. La fórmula es: `factor = corriente_real_A / voltaje_rms_adc`.
+
+**El ADC siempre devuelve el valor máximo (4095), ¿qué significa?**
+Significa que el voltaje en GPIO34 está superando los 3.3 V, lo que satura el ADC y puede dañar el pin a largo plazo. Verifica que el divisor de voltaje esté bien conectado (R1 y R2 de 10 kΩ en su lugar) y que los capacitores de filtro (C1, C2) estén correctamente polarizados.
+
+**El ESP32 no se conecta al WiFi, ¿qué reviso?**
+Primero confirma que el SSID y la contraseña en el código no tengan espacios extra ni caracteres especiales mal escritos. Si las credenciales son correctas, verifica que el router esté transmitiendo en 2.4 GHz — el ESP32 no soporta redes de 5 GHz. También prueba acercar el ESP32 al router para descartar señal débil.
+
+**Las alertas de Telegram no llegan aunque el consumo supera el umbral, ¿por qué?**
+Revisa dos cosas: (1) que el `BOT_TOKEN` y el `CHAT_ID` en el código sean exactamente los que corresponden a tu bot y tu cuenta — un solo carácter incorrecto los invalida; (2) que el ESP32 tenga conexión a internet activa — envía `/estado` al bot y observa si responde. Si no responde ningún comando, el problema es de conectividad WiFi o DNS, no del umbral.
+
+**Las lecturas tienen mucho ruido y varían mucho entre mediciones, ¿cómo lo reduzco?**
+El ruido eléctrico suele deberse a capacitores mal colocados o ausentes. Verifica que C1 y C2 (10 µF cada uno) estén conectados entre el nodo de GND y la alimentación, y que C3 (acoplamiento AC) esté correctamente en serie entre el TIP del jack y el nodo bias. Como solución por software, puedes agregar un promedio móvil de 10 muestras consecutivas antes de usar el valor de corriente.
 
 ## Contribuir
 
