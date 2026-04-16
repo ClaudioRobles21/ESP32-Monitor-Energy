@@ -294,5 +294,3 @@ El potenciómetro integrado en el circuito es un componente opcional; su inclusi
 MIT © 2025 — Libre para uso personal y comercial con atribución.
 
 ---
-
-> **Nota de seguridad:** Nunca subas tu archivo `.ino` con las credenciales reales de WiFi, token de Telegram o chat ID. Usa el archivo `.gitignore` para excluir archivos de configuración sensibles, o reemplaza los valores con placeholders como se muestra en este README.
